@@ -1,4 +1,9 @@
 document.getElementById("btn_submit").addEventListener("click", inputToWhitelist);
+document.getElementById('ipt_url').onkeydown = (event) => {
+    if (event.keyCode == 13) {
+        inputToWhitelist();
+    }
+}
 updateList();
 
 // Update table with whitelisted urls
@@ -8,9 +13,7 @@ function updateList() {
 		content = "";
 
 		// Hide or show list
-		if (!Array.isArray(items.cookieWhitelist)) {
-			document.getElementById('div_urllist').style.display = 'none';
-		} else if (items.cookieWhitelist.length > 0) {
+		if (Array.isArray(items.cookieWhitelist) && items.cookieWhitelist.length > 0) {
 			document.getElementById('div_urllist').style.display = 'flex';
 
 			// Insert data into rows
@@ -20,15 +23,18 @@ function updateList() {
 				content += "<button class='itembutton' item='" + item + "' \">🞫</button>";
 				content += "</div>"
 			});
+		} else {
+			document.getElementById('div_urllist').style.display = 'none';
 		}
 		
 		// Insert content into div
 		document.getElementById('div_urllist').innerHTML = content;
 		
 		// Activate buttons
-			document.getElementsByClassName('itembutton').forEach((button) => {
-				button.addEventListener("click", whitelistRemove(button.item))
-			})
+		var buttons = document.querySelectorAll(".itembutton");
+		buttons.forEach((button) => {
+			button.onclick = function() { whitelistRemove(this.getAttribute('item')); };
+		});
 	});
 }
 
@@ -85,7 +91,8 @@ function whitelistAdd(item) {
 // Get item from input and send to whitelist
 // Returns void
 function inputToWhitelist() {
-	var item = document.getElementById("ipt_url").value;
+	var item = document.getElementById("ipt_url").value.trim();
+	item = item.replace(/\s+/g, '');
 	document.getElementById("ipt_url").value = null;
 	whitelistAdd(item);
 }
